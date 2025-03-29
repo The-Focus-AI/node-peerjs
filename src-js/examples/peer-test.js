@@ -1,5 +1,5 @@
-const wrtc = require('@roamhq/wrtc');
-const { Peer } = require('peerjs');
+import wrtc from '@roamhq/wrtc';
+import { Peer } from 'peerjs';
 
 // Mock webrtc-adapter
 const webrtcAdapter = {
@@ -25,14 +25,6 @@ global.window = {
 global.navigator = {
   platform: 'MacIntel',
   userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-  userAgentData: {
-    brands: [
-      {
-        brand: 'Chromium',
-        version: '122'
-      }
-    ]
-  },
   webkitGetUserMedia: () => {}
 };
 
@@ -51,13 +43,17 @@ require.cache[require.resolve('webrtc-adapter')] = {
 };
 
 // Mock WebRTC support detection
-const util = require('peerjs').util;
-util.supports.data = true;
-util.supports.audioVideo = true;
-util.supports.reliable = true;
-util.supports.binaryBlob = true;
-util.supports.browser = true;
-util.supports.webRTC = true;
+const { util } = await import('peerjs');
+if (util) {
+  util.supports = {
+    data: true,
+    audioVideo: true,
+    reliable: true,
+    binaryBlob: true,
+    browser: true,
+    webRTC: true
+  };
+}
 
 // Store peers globally for cleanup
 let peer1 = null;
@@ -101,6 +97,11 @@ process.on('SIGINT', () => {
   process.exit(0);
 });
 
+/**
+ * Clean up a peer connection
+ * @param {Peer} peer - The peer to clean up
+ * @param {string} label - Label for logging
+ */
 async function cleanup(peer, label = '') {
   if (!peer) return;
   
@@ -156,6 +157,9 @@ async function cleanup(peer, label = '') {
   }
 }
 
+/**
+ * Test PeerJS functionality
+ */
 async function testPeerJS() {
   let peer1 = null;
   let peer2 = null;
@@ -257,31 +261,22 @@ async function testPeerJS() {
     
     // Wait for either connection or timeout
     await Promise.race([connectionPromise, timeoutPromise]);
-    
-    // Clear timeout if connection succeeded
-    clearTimeout(connectionTimeout);
-    
-    // Wait a bit to ensure message is processed
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
     console.log('Test completed successfully');
   } catch (err) {
     console.error('Test failed:', err);
-    process.exitCode = 1;
+    throw err;
   } finally {
-    // Clean up peers
-    console.log('Starting cleanup...');
+    // Clean up
+    if (connectionTimeout) {
+      clearTimeout(connectionTimeout);
+    }
     await cleanup(peer1, 'peer1');
     await cleanup(peer2, 'peer2');
-    console.log('Cleanup finished');
-    
-    // Force exit after cleanup
-    process.exit(process.exitCode || 0);
   }
 }
 
 // Run the test
 testPeerJS().catch(err => {
-  console.error('Unhandled error:', err);
+  console.error('Test failed:', err);
   process.exit(1);
 }); 

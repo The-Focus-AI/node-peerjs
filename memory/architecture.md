@@ -1,11 +1,64 @@
 # Architecture
 
-## Tech Stack
-- Node.js
-- TypeScript
-- PeerJS for WebRTC handling
-- @roamhq/wrtc for Node.js WebRTC bindings
-- Vitest for testing
+## Technology Stack
+
+### Core Technologies
+- Node.js (ESM)
+- WebRTC (@roamhq/wrtc)
+- PeerJS
+- JSDoc for type documentation
+
+### Project Structure
+```
+.
+├── src-js/
+│   ├── NodePeer.js       # Core peer implementation
+│   └── examples/         # Example implementations
+├── tests/
+│   └── test.js          # Test suite
+└── package.json         # Project configuration
+```
+
+### Module Organization
+- `NodePeer.js`: Core WebRTC peer implementation
+- `examples/`: Example implementations and usage patterns
+- `tests/`: Test suite using Node.js test runner
+
+### Type System
+- JSDoc comments for type documentation
+- IDE integration for type checking
+- Runtime type validation where needed
+
+### Testing Strategy
+- Simple async/await based tests
+- Direct Node.js test runner
+- Clear test output and reporting
+- Timeout handling for async operations
+
+### Build Process
+- No build step required
+- Direct Node.js execution
+- Native ESM modules
+- Clean JavaScript implementation
+
+### Implementation Patterns
+
+#### Browser Environment Mocking
+- WebRTC globals properly set
+- PeerJS compatibility maintained
+- Minimal runtime overhead
+
+#### Error Handling
+- Clear error messages
+- Proper cleanup on failures
+- Timeout handling
+- Connection state management
+
+#### Testing Patterns
+- Async test helpers
+- Clear test organization
+- Proper cleanup in tests
+- Timeout handling
 
 ## Directory Layout
 ```
