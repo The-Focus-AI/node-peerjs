@@ -1,2 +1,4 @@
 [tools]
+node = "24.2.0"
+pnpm = "10.12.3"
 "npm:ts-node" = "latest"
